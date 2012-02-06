@@ -22,6 +22,7 @@ timeout           settings['unicorn']['timeout']
 pid               "#{settings['unicorn']['prefix']['pid']}#{project}.pid"
 stderr_path       "#{settings['unicorn']['prefix']['logs']}stderr.log"
 stdout_path       "#{settings['unicorn']['prefix']['logs']}stdout.log"
+listen            settings['unicorn']['listen'] if settings['unicorn']['listen']
 listen            "#{settings['unicorn']['prefix']['socket']}#{project}.sock", :backlog => 64
 
 before_fork do |server, worker|
