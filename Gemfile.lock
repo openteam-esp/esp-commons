@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    esp-commons (0.0.1)
+    esp-commons (0.0.2)
       airbrake
       configliere
       rails
