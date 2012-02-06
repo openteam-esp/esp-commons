@@ -25,8 +25,9 @@ module EspCommons
     end
 
     config.before_configuration do
-      if Rails.env.production? && Settings['unicorn.prefix.logs']
-          Rails.application.config.logger = ActiveSupport::BufferedLogger.new("#{Settings['unicorn.prefix.logs']}/application.log")
+      if ENV['UNICORN']
+        log_path = Settings['unicorn.logs_dir'] || "/var/log/esp/#{Rails.root.basename}"
+        Rails.application.config.logger = ActiveSupport::BufferedLogger.new("#{log_path}/application.log")
       end
     end
 
