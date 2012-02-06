@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'configliere'
   s.add_dependency 'rails'
   s.add_dependency 'russian'
-  s.add_dependency 'whenever'
 
   s.add_development_dependency 'sqlite3'
 end
