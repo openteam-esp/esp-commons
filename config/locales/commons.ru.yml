@@ -1,0 +1,5 @@
+ru:
+  commons:
+    not_selected: -- не выбрано --
+    delete:       удалить
+    confirm:      Вы уверены?
