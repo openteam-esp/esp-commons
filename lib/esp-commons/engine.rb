@@ -8,6 +8,7 @@ module EspCommons
       Settings.defaults Settings.extract!(Rails.env)[Rails.env] || {}
       Settings.extract!(:test, :development, :production)
       Settings.define 'app.secret',       :env_var => 'APP_SECRET'
+      Settings.define 'app.url',          :env_var => 'APP_URL'
       Settings.define 'appeals.url',      :env_var => 'APPEALS_URL'
       Settings.define 'blue-pages.url',   :env_var => 'BLUE_PAGES_URL'
       Settings.define 'cms.url',          :env_var => 'CMS_URL'
