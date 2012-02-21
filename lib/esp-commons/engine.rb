@@ -48,6 +48,7 @@ module EspCommons
 
     config.after_initialize do
       Rails.application.config.secret_token = Settings['app.secret']
+      I18n.locale = I18n.default_locale
     end
   end
 end
