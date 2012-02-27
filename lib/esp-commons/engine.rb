@@ -29,19 +29,6 @@ module EspCommons
       end
     end
 
-    config.before_initialize do
-      require 'ancestry'
-      require 'default_value_for'
-      require 'formtastic'
-      require 'has_enum'
-      require 'has_scope'
-      require 'has_searcher'
-      require 'kaminari'
-      require 'inherited_resources'
-      require 'russian'
-      require 'sunspot/rails'
-    end
-
     config.after_initialize do
       Rails.logger.level = ActiveSupport::BufferedLogger::Severity::WARN if Rails.env.production?
     end
