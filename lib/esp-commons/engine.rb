@@ -1,9 +1,12 @@
+require 'airbrake'
+require 'configliere'
+require 'api_smith'
+
 module EspCommons
   class Engine < ::Rails::Engine
     isolate_namespace EspCommons
 
     config.before_configuration do
-      require 'configliere'
       Settings.read(Rails.root.join('config', 'settings.yml')) if Rails.root.join('config', 'settings.yml').exist?
       Settings.defaults Settings.extract!(Rails.env)[Rails.env] || {}
       Settings.extract!(:test, :development, :production)
@@ -26,6 +29,19 @@ module EspCommons
       if ENV['UNICORN']
         log_path = Settings['unicorn.logs_dir'] || "/var/log/esp/#{Rails.root.basename}"
         Rails.application.config.logger = ActiveSupport::BufferedLogger.new("#{log_path}/application.log")
+      end
+    end
+
+    config.before_initialize do
+      if Settings['errors.key'].present?
+        Airbrake.configure do |config|
+          config.api_key = Settings['errors.key']
+          URI.parse(Settings['errors.url']).tap do | url |
+            config.host = url.host
+            config.port = url.port
+            config.secure = url.scheme.inquiry.https?
+          end
+        end
       end
     end
 
