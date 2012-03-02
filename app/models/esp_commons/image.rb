@@ -27,18 +27,26 @@ class EspCommons::Image < APISmith::Smash
     width && height
   end
 
+  def width?
+    width && width > 0
+  end
+
+  def height?
+    height && height > 0
+  end
+
   def aspect_ratio
     @aspect_ratio ||= width.to_f / height
   end
 
   def resize(aspect_ratio)
     self.aspect_ratio = aspect_ratio
-    if width && !height
+    if width? && !height?
       self.height = new_height
-    elsif !width && height
+    elsif !width? && height?
       self.width = new_width
     else
-      self.width = self.height = 100 if !width && !height
+      self.width = self.height = 100 if !width? && !height?
       if height >= new_height
         self.height = new_height
       else
