@@ -64,6 +64,6 @@ class EspCommons::Image < APISmith::Smash
   end
 
   def as_json(options={})
-    super(options.merge(:only => %w[url width height thumbnail description]))
+    super(options.merge(:only => %w[url width height description]))
   end
 end
