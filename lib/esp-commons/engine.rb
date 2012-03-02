@@ -53,5 +53,17 @@ module EspCommons
       Rails.application.config.secret_token = Settings['app.secret']
       I18n.locale = I18n.default_locale
     end
+
+    config.to_prepare do
+      ActionController::Base.class_eval do
+        helper_method :image_tag_for
+
+        protected
+
+          def image_tag_for(image)
+            view_context.image_tag(image.url, :width => image.width, :height => image.height, :alt => image.description) if image
+          end
+      end
+    end
   end
 end
