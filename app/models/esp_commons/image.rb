@@ -3,6 +3,7 @@ class EspCommons::Image < APISmith::Smash
   property :description
   property :thumbnail
 
+  property :vfs_url
   property :id,         :transformer => :to_i
   property :width,      :transformer => :to_i
   property :height,     :transformer => :to_i
@@ -13,15 +14,17 @@ class EspCommons::Image < APISmith::Smash
 
   def parse_url
     self.tap do | image |
-      matches = url.match(%r{files/(\d+)/(\d+)-(\d+)/(.*)})
-
-      image.id, image.width, image.height, image.filename = matches[1..-1] if matches
+      image.vfs_url, image.id, image.width, image.height, image.filename = url.match(%r{(.*)/files/(\d+)/(?:(\d+)-(\d+)/)?(.*)})[1..-1]
     end
   end
 
   def build_url
     self.tap do | image |
-      image.url = "#{Settings['vfs.url']}/files/#{image.id}/#{image.width}-#{image.height}/#{image.filename}"
+      if image?
+        image.url = "#{vfs_url}/files/#{image.id}/#{image.width}-#{image.height}/#{image.filename}"
+      else
+        image.url = "#{vfs_url}/files/#{image.id}/#{image.filename}"
+      end
     end
   end
 
@@ -68,7 +71,7 @@ class EspCommons::Image < APISmith::Smash
 
   def create_thumbnail(options)
     return unless image?
-    self.thumbnail = EspCommons::Image.new(options.merge(:id => id, :filename => filename, :description => description))
+    self.thumbnail = EspCommons::Image.new(options.merge(:vfs_url => vfs_url,  :id => id, :filename => filename, :description => description))
                                       .resize(aspect_ratio)
                                       .build_url
   end

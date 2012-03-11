@@ -56,12 +56,18 @@ module EspCommons
 
     config.to_prepare do
       ActionController::Base.class_eval do
-        helper_method :image_tag_for
+        helper_method :image_tag_for, :thumbnail_tag
 
         protected
 
           def image_tag_for(image)
             view_context.image_tag(image.url, :width => image.width, :height => image.height, :alt => image.description) if image
+          end
+
+          def thumbnail_tag(url, options={})
+            if url.is_a?(String)
+              image_tag_for EspCommons::Image.new(:url => url).parse_url.create_thumbnail(options)
+            end
           end
       end
     end
