@@ -13,7 +13,9 @@ class EspCommons::Image < APISmith::Smash
 
   def parse_url
     self.tap do | image |
-      image.id, image.width, image.height, image.filename = url.match(%r{files/(\d+)/(\d+)-(\d+)/(.*)})[1..-1]
+      matches = url.match(%r{files/(\d+)/(\d+)-(\d+)/(.*)})
+
+      image.id, image.width, image.height, image.filename = matches[1..-1] if matches
     end
   end
 
