@@ -74,7 +74,7 @@ class EspCommons::Image
 
   def create_thumbnail(options)
     return unless image?
-    self.thumbnail = EspCommons::Image.new(options.merge(:vfs_url => vfs_url,  :id => id, :filename => filename, :description => description))
+    self.thumbnail = EspCommons::Image.new(options.reverse_merge(:vfs_url => vfs_url,  :id => id, :filename => filename, :description => description))
                                       .resize(aspect_ratio)
                                       .build_url
   end
