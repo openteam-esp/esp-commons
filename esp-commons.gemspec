@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'airbrake'
   s.add_dependency 'configliere'
   s.add_dependency 'rails'
-  s.add_dependency 'active_attr', '~> 0.5.0.alpha.2'
+  s.add_dependency 'active_attr'
   s.add_dependency 'unicorn'
 
   s.add_development_dependency 'sqlite3'
