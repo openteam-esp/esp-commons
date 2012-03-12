@@ -80,6 +80,6 @@ class EspCommons::Image
   end
 
   def as_json(options={})
-    super(options.merge(:only => %w[url width height description]))
+    attributes.as_json(options.merge(:only => %w[url width height description]))
   end
 end
