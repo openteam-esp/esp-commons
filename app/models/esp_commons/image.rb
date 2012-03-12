@@ -1,27 +1,36 @@
-class EspCommons::Image < APISmith::Smash
-  property :url
-  property :description
-  property :thumbnail
+require 'active_attr'
 
-  property :vfs_url
-  property :id,         :transformer => :to_i
-  property :width,      :transformer => :to_i
-  property :height,     :transformer => :to_i
-  property :filename
+class EspCommons::Image
+  include ActiveAttr::Attributes
+  include ActiveAttr::MassAssignment
+  include ActiveAttr::QueryAttributes
+  include ActiveAttr::TypecastedAttributes
+
+  attribute :url
+  attribute :description
+  attribute :thumbnail
+
+  attribute :vfs_url
+  attribute :id,          :type => Integer
+  attribute :width,       :type => Integer
+  attribute :height,      :type => Integer
+  attribute :crop,        :type => Boolean
+  attribute :filename
 
 
   attr_writer :aspect_ratio
 
   def parse_url
     self.tap do | image |
-      image.vfs_url, image.id, image.width, image.height, image.filename = url.match(%r{(.*)/files/(\d+)/(?:(\d+)-(\d+)/)?(.*)})[1..-1]
+      image.vfs_url, image.id, image.width, image.height, image.crop, image.filename =
+        url.match(%r{(.*)/files/(\d+)/(?:(\d+)-(\d+)(\!)?/)?(.*)})[1..-1]
     end
   end
 
   def build_url
     self.tap do | image |
       if image?
-        image.url = "#{vfs_url}/files/#{image.id}/#{image.width}-#{image.height}/#{image.filename}"
+        image.url = "#{vfs_url}/files/#{image.id}/#{image.width}-#{image.height}#{image.crop ? '!' : ''}/#{image.filename}"
       else
         image.url = "#{vfs_url}/files/#{image.id}/#{image.filename}"
       end
@@ -29,15 +38,7 @@ class EspCommons::Image < APISmith::Smash
   end
 
   def image?
-    width && height
-  end
-
-  def width?
-    width && width > 0
-  end
-
-  def height?
-    height && height > 0
+    width? && height?
   end
 
   def aspect_ratio
@@ -52,10 +53,12 @@ class EspCommons::Image < APISmith::Smash
       self.width = new_width
     else
       self.width = self.height = 100 if !width? && !height?
-      if height >= new_height
-        self.height = new_height
-      else
-        self.width = new_width
+      unless crop
+        if height >= new_height
+          self.height = new_height
+        else
+          self.width = new_width
+        end
       end
     end
     self

@@ -1,6 +1,5 @@
 require 'airbrake'
 require 'configliere'
-require 'api_smith'
 
 module EspCommons
   class Engine < ::Rails::Engine
