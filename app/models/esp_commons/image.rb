@@ -24,7 +24,7 @@ class EspCommons::Image
     self.tap do | image |
       image.vfs_url, image.id, image.width, image.height, image.crop, image.filename =
         url.match(%r{(.*)/files/(\d+)/(?:(\d+)-(\d+)(\!)?/)?(.*)})[1..-1]
-    end
+    end if url.present?
   end
 
   def build_url

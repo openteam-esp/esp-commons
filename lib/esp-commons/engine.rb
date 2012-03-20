@@ -64,8 +64,8 @@ module EspCommons
           end
 
           def thumbnail_tag(url, options={})
-            if url.is_a?(String)
-              image_tag_for EspCommons::Image.new(:url => url).parse_url.create_thumbnail(options)
+            if url.is_a?(String) && image = EspCommons::Image.new(:url => url).parse_url
+              image_tag_for image.create_thumbnail(options)
             end
           end
       end
