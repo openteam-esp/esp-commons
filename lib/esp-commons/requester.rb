@@ -1,3 +1,5 @@
+require 'curb'
+
 class Requester
   def initialize(url, headers_accept = nil)
     @response = Curl::Easy.perform(url) do |curl|
