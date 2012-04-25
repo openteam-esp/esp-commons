@@ -4,6 +4,8 @@ module EspCommons
   class Engine < ::Rails::Engine
     isolate_namespace EspCommons
 
+    config.autoload_paths << File.expand_path('../', __FILE__)
+
     config.before_configuration do
       Settings.define 'appeals.url',      :env_var => 'APPEALS_URL'
       Settings.define 'blue-pages.url',   :env_var => 'BLUE_PAGES_URL'
