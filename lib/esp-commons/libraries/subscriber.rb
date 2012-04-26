@@ -2,6 +2,7 @@ require 'amqp'
 
 class Subscriber
   def start
+    logger.debug "RAILS_ENV=#{Rails.env}"
     subscribers.each do |subscriber|
       AMQP.start(Settings['amqp.url']) do |connection|
         channel = AMQP::Channel.new(connection)
