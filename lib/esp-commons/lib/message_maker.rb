@@ -6,7 +6,7 @@ class MessageMaker
 
     amqp_client.start
 
-    exchange = amqp_client.exchange('esp.exchange', :type => :topic)
+    exchange = amqp_client.exchange('esp', :type => :topic)
 
     queue = amqp_client.queue(queue_name, :durable => true)
 

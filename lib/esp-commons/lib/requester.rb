@@ -3,7 +3,7 @@ require 'curb'
 class Requester
   def initialize(url, headers_accept = nil)
     @response = Curl::Easy.perform(url) do |curl|
-      curl.headers['Accept'] = headers_accept
+      curl.headers['Accept'] = headers_accept if headers_accept
     end
   end
 
@@ -20,7 +20,7 @@ class Requester
   end
 
   def response_body
-    @response_body ||= response.body_str
+    @response_body ||= response.body_str.force_encoding 'UTF-8'
   end
 
   def response_hash

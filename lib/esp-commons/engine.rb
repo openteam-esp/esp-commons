@@ -4,7 +4,7 @@ module EspCommons
   class Engine < ::Rails::Engine
     isolate_namespace EspCommons
 
-    config.autoload_paths << File.expand_path('../', __FILE__)
+    config.autoload_paths << File.expand_path('../lib/', __FILE__)
 
     config.before_configuration do
       Settings.define 'appeals.url',      :env_var => 'APPEALS_URL'
