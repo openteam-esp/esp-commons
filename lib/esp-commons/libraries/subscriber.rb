@@ -2,44 +2,53 @@ require 'amqp'
 
 class Subscriber
   def start
-    logger.debug "RAILS_ENV=#{Rails.env}"
-    subscribers.each do |subscriber|
-      AMQP.start(Settings['amqp.url']) do |connection|
+    logger.debug "Subscribers runned in #{Rails.env} environment"
+    AMQP.start(Settings['amqp.url']) do |connection|
+      Signal.trap("TERM") do
+        logger.info "All subscribers stopped"
+        connection.close do
+          EM.stop { exit }
+        end
+      end
+      subscribers.each do |subscriber|
         channel = AMQP::Channel.new(connection)
         channel.prefetch(1)
 
-        exchange = channel.topic('esp')
-        queue = channel.queue(queue_name(subscriber), :durable => true)
+        topic = routing_prefix(subscriber)
 
-        queue.bind(exchange, :routing_key => '*')
+        exchange = channel.topic(topic)
+        queue = channel.queue(topic, :durable => true)
 
-        Signal.trap("TERM") do
-          connection.close do
-            logger.info "#{subscriber.class} stopped"
-            EM.stop { exit }
-          end
-        end
+        queue.bind(exchange, :routing_key => "*")
 
         queue.subscribe(:ack => true) do |header, message|
           method = header.routing_key
+          logger.debug "#{subscriber.class} receive #{method}: #{message}"
           if subscriber.respond_to?(method)
-            logger.debug("#{subscriber.class} receive #{method}: #{message}")
-            subscriber.send(method, message)
-            header.ack
+            begin
+              defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
+              subscriber.send(method, message)
+              logger.debug "#{subscriber.class} successfully executed #{method}"
+            rescue => e
+              logger.warn "#{subscriber.class} error while executing #{method} - #{e.message}"
+            end
           else
-            logger.warn "#{subscriber.class} not respond to #{method}"
+            logger.warn "#{subscriber.class} cann't execute #{method} due #{subscriber.class} not respond to #{method}"
           end
+          header.ack
         end
 
-        logger.info "#{subscriber.class} started"
+        logger.info "#{subscriber.class} listen #{queue.name}"
       end
     end
   end
 
   def subscribers
-    Dir.glob("#{Rails.root}/lib/subscribers/*").map do |subscriber_path|
+    Dir.glob("#{Rails.root}/lib/subscribers/*_subscriber.rb").map do |subscriber_path|
       require subscriber_path
-      File.basename(subscriber_path, '.rb').classify.constantize.new
+      File.basename(subscriber_path, '.rb').classify.constantize.new.tap do |subscriber|
+        subscriber.logger = logger if subscriber.respond_to? :logger=
+      end
     end
   end
 
@@ -48,7 +57,7 @@ class Subscriber
   end
 
   private
-    def queue_name(subscriber)
+    def routing_prefix(subscriber)
       from = subscriber.class.name.sub(/Subscriber$/, '').underscore
       to = Rails.application.class.name.sub('::Application', '').underscore
 

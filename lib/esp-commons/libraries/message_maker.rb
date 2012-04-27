@@ -6,9 +6,11 @@ class MessageMaker
 
     amqp_client.start
 
-    exchange = amqp_client.exchange('esp', :type => :topic)
+    exchange = amqp_client.exchange(queue_name, :type => :topic)
 
     queue = amqp_client.queue(queue_name, :durable => true)
+
+    queue.bind(exchange, :key => '*')
 
     exchange.publish(message, :key => routing_key, :persistent => true)
 
