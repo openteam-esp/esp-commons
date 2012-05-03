@@ -23,6 +23,7 @@ class Subscriber
 
         queue.subscribe(:ack => true) do |header, message|
           method = header.routing_key
+          message = JSON.parse(message)
           logger.debug "#{subscriber.class} receive #{method}: #{message}"
           if subscriber.respond_to?(method)
             begin

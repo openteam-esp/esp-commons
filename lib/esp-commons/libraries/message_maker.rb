@@ -12,9 +12,7 @@ class MessageMaker
 
     queue.bind(exchange, :key => '*')
 
-    message = message.as_json.to_json unless message.is_a? String
-
-    exchange.publish(message, :key => routing_key, :persistent => true)
+    exchange.publish(message.as_json.to_json, :key => routing_key, :persistent => true)
 
     amqp_client.stop
   end
