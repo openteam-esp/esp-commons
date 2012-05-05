@@ -2,14 +2,8 @@ require 'amqp'
 
 class Subscriber
   def start
-    logger.debug "Subscribers runned in #{Rails.env} environment"
     AMQP.start(Settings['amqp.url']) do |connection|
-      Signal.trap("TERM") do
-        logger.info "All subscribers stopped"
-        connection.close do
-          EM.stop { exit }
-        end
-      end
+      logger.debug "Subscribers runned in #{Rails.env} environment"
       subscribers.each do |subscriber|
         channel = AMQP::Channel.new(connection)
         channel.prefetch(1)
@@ -19,9 +13,7 @@ class Subscriber
         exchange = channel.topic(topic)
         queue = channel.queue(topic, :durable => true)
 
-        queue.bind(exchange, :routing_key => "*")
-
-        queue.subscribe(:ack => true) do |header, message|
+        queue.bind(exchange, :routing_key => "*").subscribe(:ack => true) do |header, message|
           method = header.routing_key
           message = JSON.parse(message)
           logger.debug "#{subscriber.class} receive #{method}: #{message}"
@@ -38,7 +30,6 @@ class Subscriber
           end
           header.ack
         end
-
         logger.info "#{subscriber.class} listen #{queue.name}"
       end
     end
@@ -54,7 +45,7 @@ class Subscriber
   end
 
   def logger
-    @@logger ||= ActiveSupport::BufferedLogger.new("#{Rails.root}/log/subscriber.log")
+    @logger ||= ActiveSupport::BufferedLogger.new("#{Rails.root}/log/subscriber.log")
   end
 
   private
