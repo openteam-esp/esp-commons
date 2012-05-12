@@ -1,7 +1,7 @@
 require 'bunny'
 
 class MessageMaker
-  def self.make_message(queue_name, routing_key, message)
+  def self.make_message(queue_name, routing_key, *message)
     amqp_client = Bunny.new(Settings['amqp.url'], :logging => false)
 
     amqp_client.start

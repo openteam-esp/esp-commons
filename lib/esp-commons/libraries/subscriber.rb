@@ -20,7 +20,7 @@ class Subscriber
           if subscriber.respond_to?(method)
             begin
               defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
-              subscriber.send(method, message)
+              subscriber.send(method, *message)
               logger.debug "#{subscriber.class} successfully executed #{method}"
             rescue => e
               logger.warn "#{subscriber.class} error while executing #{method} - #{e.message}"
