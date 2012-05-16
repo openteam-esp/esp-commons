@@ -19,7 +19,6 @@ class Subscriber
           logger.debug "#{subscriber.class} receive #{method}: #{message}"
           if subscriber.respond_to?(method)
             begin
-              defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
               subscriber.send(method, *message)
               logger.debug "#{subscriber.class} successfully executed #{method}"
             rescue => e
@@ -53,6 +52,6 @@ class Subscriber
       from = subscriber.class.name.sub(/Subscriber$/, '').underscore
       to = Rails.application.class.name.sub('::Application', '').underscore
 
-      "esp.#{from}.#{to}"
+      "esp.#{from}.#{to}".gsub /_/, '-'
     end
 end
