@@ -1,10 +1,13 @@
 require 'curb'
 
+class RequesterException < Exception
+end
+
 class Requester
   def initialize(url, headers_accept = nil)
     @response = Curl::Easy.perform(url) do |curl|
       curl.on_success { curl.headers['Accept'] = headers_accept if headers_accept }
-      curl.on_failure { raise }
+      curl.on_failure { raise RequesterException, "Unable to get data from #{url}" }
     end
   end
 
