@@ -3,7 +3,8 @@ require 'curb'
 class Requester
   def initialize(url, headers_accept = nil)
     @response = Curl::Easy.perform(url) do |curl|
-      curl.headers['Accept'] = headers_accept if headers_accept
+      curl.on_success { curl.headers['Accept'] = headers_accept if headers_accept }
+      curl.on_failure { raise }
     end
   end
 
