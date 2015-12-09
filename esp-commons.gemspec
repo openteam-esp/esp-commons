@@ -18,10 +18,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'active_attr'
   s.add_dependency 'amqp'
   s.add_dependency 'bunny'
-  s.add_dependency 'curb'
   s.add_dependency 'daemons'
   s.add_dependency 'openteam-commons'
   s.add_dependency 'rails'
+  s.add_dependency 'rest-client'
 
   s.add_development_dependency 'sqlite3'
 end

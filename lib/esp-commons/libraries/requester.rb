@@ -5,9 +5,16 @@ end
 
 class Requester
   def initialize(url, headers_accept = nil)
-    @response = Curl::Easy.perform(url) do |curl|
-      curl.on_success { curl.headers['Accept'] = headers_accept if headers_accept }
-      curl.on_failure { raise RequesterException, "Unable to get data from #{url}" }
+    @response ||= RestClient::Request.execute(
+      :method => :get,
+      :url => url,
+      :timeout => 600,
+      :headers => {
+        :Accept => headers_accept,
+        :timeout => 600
+      }
+    ) do |response, request, result, &block|
+      response
     end
   end
 
@@ -15,19 +22,29 @@ class Requester
     @response
   end
 
+  def stringify_headers(headers)
+    headers.map do |k, v|
+      {
+        k.to_s.split('_').map do |s|
+          s.capitalize.gsub('Etag', 'ETag').gsub('Ua', 'UA')
+        end.join('-') => v
+      }
+    end.reduce Hash.new, :merge
+  end
+
   def response_headers
-    @response_headers ||= Hash[response.header_str.split("\r\n").map { |s| s.split(': ').map(&:strip) }]
+    @response_headers ||= stringify_headers response.headers
   end
 
   def response_status
-    @response_status ||= response.response_code
+    @response_status ||= response.code
   end
 
   def response_body
-    @response_body ||= response.body_str.force_encoding 'UTF-8'
+    @response_body ||= response.body.force_encoding 'UTF-8'
   end
 
   def response_hash
-    @response_hash ||= ActiveSupport::JSON.decode(response_body)
+    @response_hash ||= ActiveSupport::JSON.decode(response_body) rescue {}
   end
 end
