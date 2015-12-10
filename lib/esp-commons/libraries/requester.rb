@@ -1,4 +1,4 @@
-require 'uri'
+require 'curb'
 
 class RequesterException < Exception
 end
@@ -7,7 +7,7 @@ class Requester
   def initialize(url, headers_accept = nil)
     @response ||= RestClient::Request.execute(
       :method => :get,
-      :url => URI.encode(url),
+      :url => url,
       :timeout => 600,
       :headers => {
         :Accept => headers_accept,
