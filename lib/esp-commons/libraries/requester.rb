@@ -8,10 +8,9 @@ class Requester
     @response ||= RestClient::Request.execute(
       :method => :get,
       :url => url,
-      :timeout => 600,
+      :timeout => nil,
       :headers => {
-        :Accept => headers_accept,
-        :timeout => 600
+        :Accept => headers_accept
       }
     ) do |response, request, result, &block|
       response
@@ -41,7 +40,7 @@ class Requester
   end
 
   def response_body
-    @response_body ||= response.body.force_encoding 'UTF-8'
+    @response_body ||= response.body.force_encoding('UTF-8')
   end
 
   def response_hash
