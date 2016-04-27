@@ -16,20 +16,20 @@ class Subscriber
         queue.bind(exchange, :routing_key => "*").subscribe(:ack => true) do |header, message|
           method = header.routing_key
           message = JSON.parse(message)
-          logger.debug "#{subscriber.class} receive #{method}: #{message}"
+          logger.debug "DEBUG: #{Time.zone.now}: #{subscriber.class} receive #{method}: #{message}"
           if subscriber.respond_to?(method)
             begin
               subscriber.send(method, *message)
-              logger.debug "#{subscriber.class} successfully executed #{method}"
+              logger.debug "DEBUG: #{Time.zone.now}: #{subscriber.class} successfully executed #{method}"
             rescue => e
-              logger.warn "#{subscriber.class} error while executing #{method} - #{e.message}"
+              logger.warn "WARN: #{Time.zone.now}: #{subscriber.class} error while executing #{method} - #{e.message}"
             end
           else
-            logger.warn "#{subscriber.class} cann't execute #{method} due #{subscriber.class} not respond to #{method}"
+            logger.warn "WARN: #{Time.zone.now}: #{subscriber.class} cann't execute #{method} due #{subscriber.class} not respond to #{method}"
           end
           header.ack
         end
-        logger.info "#{subscriber.class} listen #{queue.name}"
+        logger.info "INFO: #{Time.zone.now}: #{subscriber.class} listen #{queue.name}"
       end
     end
   end
